@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_tags %} {# For |add_class #}
+
+{% block content %}
+
+<!-- Estimated Price Banner -->
+{% if estimated_price %}
+<div class="alert alert-info text-center fs-5 rounded-0">
+  <strong>Estimated Price:</strong> ₹{{ estimated_price }}
+</div>
+{% endif %}
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header text-white text-center py-3" style="background-color: #07435C;">
+          <h3 class="mb-0">🚲 Sell Your Bike</h3>
+        </div>
+
+        <div class="card-body p-4 bg-light">
+          <!--  -->
+          <form method="POST" enctype="multipart/form-data" action="{% url 'sell:sell_bike_page' %}">
+            {% csrf_token %}
+
+            {{ listing_form.as_p }}
+
+            <label for="id_image">Upload Bike Images (you can select multiple):</label>
+            {{ image_form.image|add_class:"form-control" }}
+
+            <button type="submit" class="btn btn-success mt-3">Submit</button>
+          </form>
+
+
+          <!--  -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Thank You Modal -->
+<div class="modal fade" id="thankYouModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center shadow">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">🎉 Thank You!</h5>
+      </div>
+      <div class="modal-body">
+        <p>Your bike has been successfully listed.</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        {% if bike_id %}
+        <a href="{% url 'buy:bike_detail' bike_id %}" class="btn btn-primary">View Details</a>
+        {% endif %}
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">Go Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Show Modal If Successful -->
+{% if show_modal %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var myModal = new bootstrap.Modal(document.getElementById('thankYouModal'));
+    myModal.show();
+  });
+</script>
+{% endif %}
+
+{% endblock %}
+
+
+
+
+
+
+
+def sell_bike_page(request):
+    sell_data = request.session.get('sell_data')
+    if not sell_data:
+        return redirect('sell:sell_bike')
+
+    manual_fields = ['brand', 'model', 'variant', 'year', 'kilometers_driven', 'owner']
+
+    if request.method == 'POST':
+        listing_form = BikeListingForm(request.POST)
+        image_form = BikeImageForm()  # Only for rendering in template
+
+        if listing_form.is_valid():
+            images = request.FILES.getlist('image')
+
+            if not images:
+                listing_form.add_error(None, "Please upload at least one image.")
+                # Prepare remaining_form for rendering
+                remaining_form = BikeListingForm()
+                for field_name in manual_fields:
+                    if field_name in remaining_form.fields:
+                        remaining_form.fields.pop(field_name)
+
+                return render(request, 'sell/sell_form.html', {
+                    'listing_form': listing_form,
+                    'remaining_form': remaining_form,
+                    'image_form': image_form,
+                    'estimated_price': sell_data.get('price'),
+                    'lock_fields': True,
+                })
+
+            bike = listing_form.save(commit=False)
+            bike.price = sell_data.get('price', 0)
+            bike.save()
+
+            for img in images:
+                BikeImage.objects.create(bike=bike, image=img)
+
+            # Set first image as main bike image if available
+            first_img = bike.gallery_images.first()
+            if first_img:
+                bike.image = first_img.image
+                bike.save()
+
+            if 'sell_data' in request.session:
+                del request.session['sell_data']
+
+            # Prepare empty forms for the thank you modal page
+            remaining_form = BikeListingForm()
+            for field_name in manual_fields:
+                if field_name in remaining_form.fields:
+                    remaining_form.fields.pop(field_name)
+
+            return render(request, 'sell/sell_form.html', {
+                'listing_form': BikeListingForm(),
+                'remaining_form': remaining_form,
+                'image_form': BikeImageForm(),
+                'show_modal': True,
+                'bike_id': bike.id,
+                'estimated_price': bike.price,
+                'lock_fields': True,
+            })
+
+        else:
+            # listing form invalid - prepare remaining_form and re-render
+            remaining_form = BikeListingForm()
+            for field_name in manual_fields:
+                if field_name in remaining_form.fields:
+                    remaining_form.fields.pop(field_name)
+
+            return render(request, 'sell/sell_form.html', {
+                'listing_form': listing_form,
+                'remaining_form': remaining_form,
+                'image_form': image_form,
+                'estimated_price': sell_data.get('price'),
+                'lock_fields': True,
+            })
+
+    else:
+        # GET request - populate form with initial sell_data
+        initial_data = {
+            'brand': sell_data.get('brand'),
+            'model': sell_data.get('model'),
+            'variant': sell_data.get('variant'),
+            'year': sell_data.get('year'),
+            'kilometers_driven': sell_data.get('kms_driven'),
+            'owner': sell_data.get('owner'),
+        }
+        listing_form = BikeListingForm(initial=initial_data)
+        image_form = BikeImageForm()
+
+        remaining_form = BikeListingForm()
+        for field_name in manual_fields:
+            if field_name in remaining_form.fields:
+                remaining_form.fields.pop(field_name)
+
+        return render(request, 'sell/sell_form.html', {
+            'listing_form': listing_form,
+            'remaining_form': remaining_form,
+            'image_form': image_form,
+            'estimated_price': sell_data.get('price'),
+            'lock_fields': True,
+        })
+    

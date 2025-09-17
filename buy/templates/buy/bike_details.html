@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<style>
+  .bike-detail-wrapper {
+    display: flex;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    flex-wrap: wrap;
+  }
+
+  .bike-gallery {
+    flex: 2;
+  }
+
+  .main-image {
+    width: 100%;
+    border-radius: 20px;
+    object-fit: cover;
+    max-height: 400px;
+    background-color: #f7f7f7;
+    padding: 10px;
+  }
+
+  .thumbnail-gallery {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #0072ff #f0f0f0; /* Firefox */
+  }
+
+  .thumbnail-gallery::-webkit-scrollbar {
+    height: 8px;
+  }
+  .thumbnail-gallery::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+  }
+  .thumbnail-gallery::-webkit-scrollbar-thumb {
+    background-color: #0072ff;
+    border-radius: 10px;
+    border: 2px solid #f0f0f0;
+  }
+
+  .thumbnail-gallery img {
+    height: 80px;
+    width: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.3s ease;
+  }
+
+  .thumbnail-gallery img:hover {
+    border-color: #0072ff;
+  }
+
+  .bike-info-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 16px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 300px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    border: none;
+  }
+
+  .bike-info-card h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #003049;
+    margin-bottom: 0.5rem;
+  }
+
+  .bike-info-card p {
+    margin: 6px 0;
+    font-size: 1rem;
+    color: #333;
+  }
+
+  .bike-info-card .location {
+    font-weight: bold;
+    text-decoration: underline;
+    color: #003049;
+  }
+
+  .btn-test-ride {
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    border: none;
+    padding: 12px 20px;
+    color: white;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+
+  .btn-test-ride:hover {
+    filter: brightness(110%);
+    transition: filter 0.3s ease;
+  }
+
+  .btn-buy {
+    background-color: #003049;
+    border: none;
+    padding: 12px 20px;
+    color: white;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-buy:hover {
+    background-color: #005077;
+  }
+
+  .info-note {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  @media (max-width: 768px) {
+    .bike-detail-wrapper {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .bike-info-card {
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+  }
+
+   /* Container with shadow and rounded corners */
+  .bike-overview {
+    background: #fafafa;
+    border: 1px solid black;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    margin-top: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .bike-overview h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+  }
+
+  .overview-grid {
+    display: flex;
+    gap: 2rem;
+    justify-content: space-between;
+  }
+
+  /* Left grey block */
+  .overview-left {
+    background-color: #d4d4d4;
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    flex: 1.2;
+    box-sizing: border-box;
+  }
+
+  /* Other three columns */
+  .overview-column {
+    flex: 1;
+  }
+
+  /* Rows inside all columns */
+  .overview-left p,
+  .overview-column p {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.6rem 0;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  /* Dark teal text for values */
+  .overview-left span,
+  .overview-column span {
+    color: #0f4a5c;
+    font-weight: 700;
+  }
+
+  /* Horizontal line between rows */
+  .overview-left hr,
+  .overview-column hr {
+    border: none;
+    border-top: 1px solid #99999980;
+    margin: 0.3rem 0;
+  }
+  .steps-container {
+            text-align: center;
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+        }
+        .steps-container h2 {
+            margin-bottom: 40px;
+        }
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .step {
+            width: 28%;
+        }
+        .step img {
+            max-width: 100%;
+            max-height: 280px;
+        }
+        .arrow {
+            font-size: 40px;
+            margin: 0 10px;
+            user-select: none;
+        }
+        .step-title {
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+        }
+        .step-description {
+            margin-top: 8px;
+            font-size: 14px;
+        }
+        .textcolor{
+            color: #05334c;
+        }
+</style>
+
+<div class="bike-detail-wrapper">
+
+  <!-- LEFT SIDE: Main Image + Gallery -->
+  <div class="bike-gallery">
+    <img id="mainImage" src="{{ bike.image.url }}" alt="{{ bike.brand }} {{ bike.model }}" class="main-image">
+
+    <!-- Thumbnail gallery -->
+    <div class="thumbnail-gallery">
+      <img src="{{ bike.image.url }}" alt="Thumbnail">
+      {% for img in bike.gallery_images.all %}
+        <img src="{{ img.image.url }}" alt="Thumbnail">
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE: Bike Info Card -->
+ <!-- RIGHT SIDE: Bike Info Card -->
+<div class="bike-info-card">
+  <h2>{{ bike.year }} | {{ bike.brand }} {{ bike.model }}</h2>
+  <p>{{ bike.kilometers_driven }}Km • {{ bike.owner }} Owner</p>
+  <p class="location">{{ bike.location }}</p>
+
+  <button class="btn-test-ride">
+    Book Test Ride
+    <div class="info-note">(₹1000/- Refundable for Next Three Days)</div>
+  </button>
+
+  <div class="info-note">Interested in Buying this Bike?</div>
+
+  <form method="get" action="{% url 'buy:payment' bike.id %}">
+    <input type="hidden" name="price" value="{{ bike.price }}">
+   {% if not bike.booked %} 
+  <button class="btn text-white w-100" style="background-color: #003049;">Buy Now</a>
+{% else %}
+  <button class="btn btn-secondary" disabled>Booked</button>
+{% endif %}
+
+  </form>
+</div>
+
+
+</div>
+
+<!-- Bike Overview Section -->
+
+<div class="bike-overview">
+  <h2>Bike OverView</h2>
+
+  <div class="overview-grid">
+
+    <!-- Left Block (Grey) -->
+    <div class="overview-left">
+      <p>Bike Brand <span>{{ bike.brand }}</span></p>
+      <hr>
+      <p>Bike Model <span>{{ bike.model }}</span></p>
+      <hr>
+      <p>Bike Variant <span>{{ bike.engine_cc }}CC</span></p>
+      <hr>
+      <p>Make Year <span>{{ bike.year }}</span></p>
+    </div>
+
+    <!-- Center Left Column -->
+    <div class="overview-column">
+      <p>Refurbished <span>{{ bike.refurbished|yesno:"Yes,No" }}</span></p>
+      <hr>
+      <p>RTO State <span>{{ bike.rto_state }}</span></p>
+      <hr>
+      <p>RTO City <span>{{ bike.rto_city }}</span></p>
+      <hr>
+      <p>Registration Year <span>{{ bike.registration_year|default:"-" }}</span></p>
+    </div>
+
+    <!-- Center Right Column -->
+    <div class="overview-column">
+      <p>Kilometers <span>{{ bike.kilometers_driven }}Km</span></p>
+      <hr>
+      <p>Owners <span>{{ bike.owner }}</span></p>
+      <hr>
+      <p>Transmission <span>{{ bike.transmission }}</span></p>
+      <hr>
+      <p>Fuel Type <span>{{ bike.fuel_type }}</span></p>
+    </div>
+
+    <!-- Right Column -->
+    <div class="overview-column">
+      <p>Registration Certificate <span>{{ bike.rc_available|yesno:"Yes,No" }}</span></p>
+      <hr>
+      <p>Finance <span>{{ bike.finance|yesno:"Yes,No" }}</span></p>
+      <hr>
+      <p>Insurance <span>{{ bike.insurance|yesno:"Yes,No" }}</span></p>
+      <hr>
+      <p>Warranty <span>{{ bike.warranty|yesno:"Yes,No" }}</span></p>
+    </div>
+
+  </div>
+</div>
+
+ <div class="steps-container mt-5">
+    <h2>Book This Bike in 3 Easy Steps</h2>
+    <div class="steps">
+        {% for step in steps %}
+            <div class="step">
+                <img src="{{ step.image.url }}" alt="{{ step.title }}" style="max-width: 300px;">
+                <div class="step-title">{{ step.title }}</div>
+                <!-- <div class="step-description">{{ step.description }}</div> -->
+            </div>
+            {% if not forloop.last %}
+                <div class="arrow">&#8594;</div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+
+<div class="specification-container container card my-5 p-4" style="box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); border-radius: 20px; border: 1px solid black;">
+    <h3 class="mb-4">Bike Specification</h3>
+    <div class="row">
+        <div class="col-md-2 "><strong>Type</strong><br><span class="textcolor fw-semibold">{{ bike.get_category_display }}</span></div>
+        <div class="col-md-2 "><strong>Color</strong><br><span class="textcolor fw-semibold">{{ bike.color }}</span></div>
+        <div class="col-md-2 "><strong>Fuel Type</strong><br><span class="textcolor fw-semibold">{{ bike.fuel_type }}</span></div>
+        <div class="col-md-3 "><strong>Ignition Type</strong><br><span class="textcolor fw-semibold">{{ bike.ignition_type }}</span></div>
+        <div class="col-md-3 "><strong>Transmission Type</strong><br><span class="textcolor fw-semibold">{{ bike.transmission }}</span></div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-2 "><strong>Front Brake Type</strong><br><span class="textcolor fw-semibold">{{ bike.front_brake_type }}</span></div>
+        <div class="col-md-2 "><strong>Rear Brake Type</strong><br><span class="textcolor fw-semibold">{{ bike.rear_brake_type }}</span></div>
+        <div class="col-md-2 "><strong>ABS</strong><br><span class="textcolor fw-semibold">{% if bike.abs %}Yes{% else %}No{% endif %}</span></div>
+        <div class="col-md-3 "><strong>Odometer</strong><br><span class="textcolor fw-semibold">{{ bike.odometer_type }}</span></div>
+        <div class="col-md-3 "><strong>Wheelytype</strong><br><span class="textcolor fw-semibold">{{ bike.wheel_type }}</span></div>
+    </div>
+</div>
+
+
+<script>
+  document.querySelectorAll('.thumbnail-gallery img').forEach(img => {
+    img.addEventListener('click', () => {
+      document.getElementById('mainImage').src = img.src;
+    });
+  });
+</script>
+
+
+
+{% endblock %}

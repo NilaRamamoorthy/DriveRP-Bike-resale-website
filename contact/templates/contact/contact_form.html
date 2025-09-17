@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_tags %}
+
+{% block content %}
+<h2 class="text-center mb-4">Contact Us</h2>
+
+<div class="container my-5">
+  <div class="row">
+    <!-- Contact Form -->
+     <div class="col-md-6">
+    <form method="post" class="contact-form ">
+    {% csrf_token %}
+    {{ form.name }}
+    {{ form.email }}
+    {{ form.phone }}
+    {{ form.reason }}
+    {{ form.source }}
+    {{ form.message }}
+    <button type="submit" class="btn btn-primary">Send</button>
+</form>
+
+</div>
+    <!-- Google Map + Contact Info -->
+    <div class="col-md-6">
+      <iframe src="https://www.google.com/maps/embed?...your_url_here..."
+              width="100%" height="300" style="border:0;" allowfullscreen loading="lazy"></iframe>
+
+      <div class="mt-3">
+        <p><strong>Address:</strong><br>
+        51, Rajaji Street, GST Road,<br>
+        Chengalpattu-603104.<br>
+        Tamil Nadu, India.<br>
+        <a href="https://www.DriveRp.in">www.DriveRp.in</a><br>
+        📞 +91 987 952 1234</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+
+
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-success shadow">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Message Sent</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Thank you for contacting us! We’ll get back to you shortly.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% if show_modal %}
+  <script>
+    window.addEventListener('load', function () {
+      const modal = new bootstrap.Modal(document.getElementById('successModal'));
+      modal.show();
+    });
+  </script>
+{% endif %}
+{% endblock %}

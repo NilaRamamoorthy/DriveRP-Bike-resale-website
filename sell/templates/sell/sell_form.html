@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_tags %} {# For |add_class #}
+
+{% block content %}
+
+<!-- Estimated Price Banner -->
+{% if estimated_price %}
+<div class="alert alert-info text-center fs-5 rounded-0">
+  <strong>Estimated Price:</strong> ₹{{ estimated_price }}
+</div>
+{% endif %}
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header text-white text-center py-3" style="background-color: #07435C;">
+          <h3 class="mb-0">🚲 Sell Your Bike</h3>
+        </div>
+
+        <div class="card-body p-4 bg-light">
+          <!--  -->
+          <form method="POST" enctype="multipart/form-data" action="{% url 'sell:sell_bike_page' %}">
+            {% csrf_token %}
+
+           <!-- Locked fields rendered manually as disabled inputs -->
+  <div class="mb-3">
+  <label class="form-label fw-bold">Brand</label>
+  <input type="text" class="form-control" value="{{ brand_name }}" readonly>
+  <input type="hidden" name="brand" value="{{ listing_form.brand.value }}">
+</div>
+
+<div class="mb-3">
+  <label class="form-label fw-bold">Model</label>
+  <input type="text" class="form-control" value="{{ model_name }}" readonly>
+  <input type="hidden" name="model" value="{{ listing_form.model.value }}">
+</div>
+
+<div class="mb-3">
+  <label class="form-label fw-bold">Variant</label>
+  <input type="text" class="form-control" value="{{ variant_name }}" readonly>
+  <input type="hidden" name="variant" value="{{ listing_form.variant.value }}">
+</div>
+
+  <div class="mb-3">
+    <label for="id_year" class="form-label">Year</label>
+    <input type="text" id="id_year" class="form-control" value="{{ listing_form.year.value }}" readonly>
+    <input type="hidden" name="year" value="{{ listing_form.year.value }}">
+  </div>
+
+  <div class="mb-3">
+    <label for="id_kilometers_driven" class="form-label">Kilometers Driven</label>
+    <input type="text" id="id_kilometers_driven" class="form-control" value="{{ listing_form.kilometers_driven.value }}" disabled>
+    <input type="hidden" name="kilometers_driven" value="{{ listing_form.kilometers_driven.value }}">
+  </div>
+
+  <div class="mb-3">
+    <label for="id_owner" class="form-label">Owner</label>
+    <input type="text" id="id_owner" class="form-control" value="{{ listing_form.owner.value }}" disabled>
+    <input type="hidden" name="owner" value="{{ listing_form.owner.value }}">
+  </div>
+
+  <!-- Render remaining fields normally -->
+  {{ remaining_form.as_p }}
+
+            <label for="id_image">Upload Bike Images (you can select multiple):</label>
+            {{ image_form.image|add_class:"form-control" }}
+
+            <button type="submit" class="btn btn-success mt-3">Submit</button>
+          </form>
+
+
+          <!--  -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Thank You Modal -->
+<div class="modal fade" id="thankYouModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center shadow">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">🎉 Thank You!</h5>
+      </div>
+      <div class="modal-body">
+        <p>Your bike has been successfully listed.</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        {% if bike_id %}
+        <a href="{% url 'buy:bike_detail' bike_id %}" class="btn btn-primary">View Details</a>
+        {% endif %}
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">Go Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Show Modal If Successful -->
+{% if show_modal %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var myModal = new bootstrap.Modal(document.getElementById('thankYouModal'));
+    myModal.show();
+  });
+</script>
+{% endif %}
+
+{% endblock %}

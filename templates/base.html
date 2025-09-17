@@ -1,0 +1,576 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}DriveRP{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- for search icon -->
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'buy/css/buy.css' %}">
+
+    <style>
+        .nav-link {
+            color: #07435C;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #20B2AA !important;
+            /* Light teal */
+            font-weight: 600;
+
+        }
+.bg-input {
+  background-color: #07435C !important;
+  border: none;
+  border-radius: 20px;
+}
+
+.bg-input::placeholder {
+  color: #cccccc;
+}
+
+.bg-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25); /* Light teal glow */
+}
+
+/* Sell */
+.sell-form-section {
+    background-size: cover;
+    background-position: center;
+    padding: 30px;
+    border-radius: 12px;
+    color: white;
+}
+
+#sell-bike-form {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+#sell-bike-form select, #sell-bike-form button {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.hero-section h2 {
+    text-shadow: 2px 2px 4px #0a91c3;
+}
+
+/* Buy */
+  /* Sidebar styles */
+  .bike-container {
+    display: flex;
+    gap: 20px;
+    /* background: #dcebf9; */
+    padding: 15px;
+  }
+
+  .filter-sidebar {
+    width: 220px;
+    background: #dcebf9;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+
+  .filter-sidebar h3 {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #144a64;
+  }
+
+  .filter-section {
+    border-bottom: 1px solid #a3a3a3;
+    margin-bottom: 10px;
+  }
+
+  .filter-toggle {
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 0;
+    cursor: pointer;
+    color: #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .filter-toggle:hover {
+    color: #007bff;
+  }
+
+  .arrow {
+    transition: transform 0.3s ease;
+  }
+
+  .filter-toggle[aria-expanded="true"] .arrow {
+    transform: rotate(180deg);
+  }
+
+  .filter-content {
+    padding: 10px 0 15px 5px;
+  }
+
+  .filter-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .filter-content ul li {
+    margin-bottom: 6px;
+  }
+
+  .filter-content input[type="checkbox"] {
+    margin-right: 8px;
+  }
+
+  /* Main Content */
+  .bike-main {
+    flex: 1;
+  }
+
+  .bike-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+  }
+
+  .bike-header select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #dcebf9;
+  }
+
+  /* Bike Cards */
+  .bike-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(230px,1fr));
+    gap: 18px;
+  }
+
+  .bike-card {
+    background: #d9f3f9;
+    border-radius: 10px;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    position: relative;
+  }
+
+  .bike-card img {
+    width: 100%;
+    border-radius: 10px;
+  }
+
+  .booked-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #c70000;
+    color: #fff;
+    padding: 4px 10px;
+    font-size: 13px;
+    border-radius: 5px;
+    font-weight: 700;
+  }
+
+  .title {
+    color: #0a5882;
+    font-weight: 700;
+    font-size: 15px;
+    margin: 10px 0 5px 0;
+  }
+
+  .details {
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #0a5882;
+  }
+
+  .price {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 3px;
+  }
+
+  .location {
+    font-size: 14px;
+    color: #0a5882;
+  }
+
+  /* Pagination */
+  .pagination ul {
+    display: flex;
+    list-style: none;
+    padding-left: 0;
+    gap: 10px;
+  }
+
+  .pagination li strong {
+    font-weight: 700;
+  }
+
+  .pagination a {
+    color: #0a5882;
+    text-decoration: none;
+  }
+.contact-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+}
+.contact-form-map-wrapper {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.contact-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.contact-form input,
+.contact-form textarea,
+.contact-form select {
+  padding: 10px;
+  width: 100%;
+}
+.contact-form button {
+  background: #004c5f;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+.map-section {
+  flex: 1;
+}
+.contact-address {
+  margin-top: 10px;
+}
+/* home */
+.bike-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.bike-background {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 100%;
+  background: linear-gradient(180deg, #fe8375, #f96fa6,#95359e); /* pinkish-orange gradient */
+  border-radius: 40px 40px 100px 100px;
+  z-index: 1;
+}
+
+.bike-image-wrapper img {
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+  height: auto;
+}
+
+
+  .faq-section {
+    max-width: 720px;
+  }
+
+  .bg-cyan-50 {
+    background-color: #ecfeff; /* Tailwind's cyan-50 */
+  }
+
+  .accordion-button {
+    border-radius: 0.5rem !important;
+  }
+
+  .accordion-item {
+    border-radius: 0.5rem !important;
+  }
+
+  .accordion-button:not(.collapsed) {
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: none;
+  }
+
+  .accordion-body {
+    border-top: 1px solid #eee;
+    padding-top: 0.75rem;
+  }
+  .filter-section input[type="range"] {
+  width: 100%;
+  margin-top: 10px;
+}
+
+#km_display {
+  width: 100px;
+  font-weight: bold;
+  text-align: center;
+  margin: 5px 0;
+}
+.category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: space-around;
+  padding-top: 10px;
+}
+
+.category-grid label {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.category-grid img {
+  width: 60px;
+  height: auto;
+  margin-bottom: 5px;
+}
+
+.cat-label {
+  font-weight: bold;
+}
+.year-slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.year-inputs {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+input[type="range"] {
+  width: 100%;
+  margin: 5px 0;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-weight: bold;
+}
+
+ img {
+    border-radius: 1rem;
+    object-fit: cover;
+  }
+
+  @media (max-width: 767px) {
+    /* Stack on mobile */
+    .d-flex.flex-wrap {
+      flex-direction: column;
+    }
+  }
+
+  .bike-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <!-- Header Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3 px-4">
+            <div class="container-fluid">
+
+                <!-- Logo (image or fallback) -->
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                    {% if site_settings and site_settings.logo %}
+                    <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.name }}" class="logo-img me-2"
+                        style="height: 50px;">
+                    {% else %}
+                    <span class="drive fw-bold fs-4">Drive</span><span class="rp fw-bold fs-4">RP</span>
+                    {% endif %}
+                </a>
+
+                <!-- Hamburger button (mobile) -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Collapsible nav -->
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-5">
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.path == '/' %} active{% endif %}"
+                                href="{% url 'home' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.path|slice:":5" == '/buy/' %} active{% endif %}" 
+   href="{% url 'buy:buy_bike' %}">Buy Bike</a>
+
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.path|slice:":6" == '/sell/' %} active{% endif %}"
+                                href="{% url 'sell:sell_bike' %}">Sell Bike</a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.path == '/about/' %} active{% endif %}"
+                                href="{% url 'about_us' %}">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.path == '/contact/' %} active{% endif %}"
+                                href="{% url 'contact:contact_us' %}">Contact Us</a>
+                        </li>
+                    </ul>
+
+                    <!-- Right-side buttons -->
+                    <div class="d-flex align-items-center gap-3">
+                       {% if user.is_authenticated %}
+ <form method="POST" action="{% url 'logout' %}">
+  {% csrf_token %}
+  <button type="submit" class="btn login-btn rounded-pill px-5"
+          style="background-color: #07435C; color: white; border: none;">
+    Logout
+  </button>
+</form>
+
+{% else %}
+    <a href="{% url 'login' %}" class="btn login-btn rounded-pill px-5"
+       style="background-color: #07435C; color: white;">Login</a>
+{% endif %}
+
+
+                        <button class="btn btn-outline-secondary rounded-circle">
+                            <i class="bi bi-search"></i> <!-- Bootstrap Icons -->
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+    </header>
+
+    <!-- Page Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-white py-5">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+
+                <!-- Logo -->
+                <div class="col-md-4 mb-4 mb-md-0 text-center text-md-start">
+                    {% if site_settings and site_settings.footer_logo %}
+                    <img src="{{ site_settings.footer_logo.url }}" alt="{{ site_settings.name }}" class="img-fluid mb-3"
+                        style="max-height: 150px;">
+                    {% else %}
+                    <h2 class="fw-bold">DriveRP</h2>
+                    {% endif %}
+
+                      <h6 class="mt-4">Get in touch</h6>
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-start">
+                        <a href="https://wa.me/yourwhatsapplink" class="text-white fs-4"><i
+                                class="bi bi-whatsapp"></i></a>
+                        <a href="https://youtube.com/yourchannel" class="text-white fs-4"><i
+                                class="bi bi-youtube"></i></a>
+                        <a href="https://instagram.com/yourprofile" class="text-white fs-4"><i
+                                class="bi bi-instagram"></i></a>
+                        <a href="https://facebook.com/yourpage" class="text-white fs-4"><i
+                                class="bi bi-facebook"></i></a>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="col-md-2 mb-4 mb-md-0">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'home' %}" class="footer-link">Home</a></li>
+                        <li><a href="{% url 'about_us' %}" class="footer-link">About Us</a></li>
+                        <li><a href="{% url 'contact:contact_us' %}" class="footer-link">Contact Us</a></li>
+                        <li><a href="{% url 'buy:buy_bike' %}" class="footer-link">Buy Bike</a></li>
+                        <li><a href="{% url 'sell:sell_bike' %}" class="footer-link">Sell Bike</a></li>
+                    </ul>
+                </div>
+
+                <!-- Electric Two-Wheelers List + Bike Image -->
+                <div class="col-md-4 mb-4 mb-md-0 d-flex flex-column  text-start">
+                   <h5 class="mb-3 ">Electric Two-Wheelers</h5>
+                    <div class="d-flex">
+                    <div>
+                    
+                    <ul class="list-unstyled mb-3">
+                        <li>Motorcycles</li>
+                        <li>Scooters</li>
+                        <li>Mopeds</li>
+                        <li>ATV</li>
+                        <li>Custom Bikes</li>
+                    </ul>
+                    </div>
+                    <div>
+
+      {% if site_settings and site_settings.footer_bike %}
+                    <img src="{{ site_settings.footer_bike.url }}" alt="Bike" class="img-fluid ms-3"
+                        style="max-height: 210px; max-width: 300px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.4));">
+                    {% else %}
+                    <!-- fallback bike image -->
+                    <img src="{% static 'core/images/default_bike.png' %}" alt="Bike" class="img-fluid"
+                        style="max-height: 120px; max-width: 500px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.4));">
+                    {% endif %}
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contact Info & Social -->
+                <div class="col-md-2 text-center text-md-start">
+                    <h5 class="mb-3">Address:</h5>
+                    <p>
+                        51, Rajaji Street,<br>
+                        GST Road,<br>
+                        Chengalpattu-603104
+                    </p>
+
+                    <p class="mb-1"><i class="fas fa-globe me-2"></i><a href="https://www.DriveRp.in"
+                            class="footer-link">www.DriveRp.in</a></p>
+                    <p><i class="fas fa-phone me-2"></i>+91 987 952 1234</p>
+
+                  
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

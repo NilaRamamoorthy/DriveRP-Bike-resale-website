@@ -1,0 +1,50 @@
+.login-btn {
+  background-color: #235E76;
+  color: white;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.login-btn:hover {
+  background-color: #4b9dc3 !important;   /* Darker shade on hover */
+  transform: scale(1.05);      /* Slight zoom on hover */
+  color: black;
+}
+footer{
+  background-color:  #174a5f !important;
+}
+.footer-link {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #20B2AA; /* Light teal */
+  text-decoration: underline;
+}
+
+.bi:hover {
+  color: #20B2AA;
+  transform: scale(1.2);
+  transition: all 0.3s ease;
+}
+
+.bg-input {
+  background-color: #07435C !important;
+  border: none;
+  border-radius: 20px;
+}
+
+.bg-input::placeholder {
+  color: #cccccc;
+}
+
+.bg-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25); /* Light teal glow */
+}
+
+
+
+

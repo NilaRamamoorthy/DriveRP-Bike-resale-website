@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+<style>
+  .card[disabled] {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+</style>
+<div class="bike-container">
+
+  <aside class="filter-sidebar">
+    <h3>Filter</h3>
+
+    <form id="filterForm" method="get">
+
+      <!-- Budget -->
+      <div class="filter-section">
+        <button type="button" class="filter-toggle">Budget</button>
+        <div class="filter-content" style="display:none;">
+          <label for="min_price">Min Price</label><br>
+          <input type="number" name="min_price" id="min_price" value="{{ min_price }}">
+          <br>
+          <label for="max_price">Max Price</label><br>
+          <input type="number" name="max_price" id="max_price" value="{{ max_price }}">
+        </div>
+      </div>
+
+<!-- Category -->
+<div class="filter-section">
+  <button type="button" class="filter-toggle">Categories</button>
+  <div class="filter-content category-grid" style="display:none;">
+    <label>
+      <input type="checkbox" name="category" value="scooty" {% if 'scooty' in selected_categories %}checked{% endif %}>
+      <img src="{% static 'buy/img/catagories/scooty.png' %}" alt="Scooty">
+      <div class="cat-label">Scooty</div>
+    </label>
+
+    <label>
+      <input type="checkbox" name="category" value="motorbike" {% if 'motorbike' in selected_categories %}checked{% endif %}>
+      <img src="{% static 'buy/img/catagories/motorbike.png' %}" alt="Motorbike">
+      <div class="cat-label">Motor bike</div>
+    </label>
+
+    <label>
+      <input type="checkbox" name="category" value="ev" {% if 'ev' in selected_categories %}checked{% endif %}>
+      <img src="{% static 'buy/img/catagories/ev.png' %}" alt="EVs">
+      <div class="cat-label">EVs</div>
+    </label>
+  </div>
+</div>
+
+
+      <!-- Brand -->
+      <div class="filter-section">
+        <button type="button" class="filter-toggle">Brand</button>
+        <div class="filter-content" style="display:none;">
+          {% for brand in brands %}
+          <label>
+            <input type="checkbox" name="brand" value="{{ brand }}" {% if brand in selected_brands %}checked{% endif %}>
+            {{ brand }}
+          </label><br>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Fuel Type -->
+      <div class="filter-section">
+        <button type="button" class="filter-toggle">Fuel Type</button>
+        <div class="filter-content" style="display:none;">
+          {% for fuel in fuel_types %}
+          <label>
+            <input type="checkbox" name="fuel_type" value="{{ fuel }}" {% if fuel in selected_fuel_types %}checked{% endif %}>
+            {{ fuel }}
+          </label><br>
+          {% endfor %}
+        </div>
+      </div>
+
+     <!-- Year -->
+<div class="filter-section">
+  <button type="button" class="filter-toggle">Year</button>
+  <div class="filter-content" style="display:none;">
+    <div class="year-slider-container">
+      <div class="year-inputs">
+        <input type="number" id="minYearInput" name="min_year" value="{{ min_year|default:year_range.min_year }}">
+        —
+        <input type="number" id="maxYearInput" name="max_year" value="{{ max_year|default:year_range.max_year }}">
+      </div>
+      <!-- <input type="range" id="minYearSlider" min="{{ year_range.min_year }}" max="{{ year_range.max_year }}" value="{{ min_year|default:year_range.min_year }}" step="1">
+      <input type="range" id="maxYearSlider" min="{{ year_range.min_year }}" max="{{ year_range.max_year }}" value="{{ max_year|default:year_range.max_year }}" step="1"> -->
+
+      <div class="slider-labels">
+        <span>Minimum Year</span>
+        <span>Maximum Year</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Kilometers -->
+<div class="filter-section">
+  <button type="button" class="filter-toggle">Kilometers</button>
+  <div class="filter-content" style="display:none;">
+    <label for="km_driven">Under</label>
+    <input type="number" id="km_display" value="{% if selected_km %}{{ selected_km }}{% else %}100000{% endif %}">
+<input type="range" id="km_slider" name="km" min="0" max="100000" step="1000" value="{% if selected_km %}{{ selected_km }}{% else %}100000{% endif %}">
+
+  </div>
+</div>
+
+      <!-- Color -->
+      <div class="filter-section">
+        <button type="button" class="filter-toggle">Color</button>
+        <div class="filter-content" style="display:none;">
+          {% for color in colors %}
+          <label>
+            <input type="checkbox" name="color" value="{{ color }}" {% if color in selected_colors %}checked{% endif %}>
+            {{ color }}
+          </label><br>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- EngineTrim CC -->
+<div class="filter-section">
+  <button type="button" class="filter-toggle">EngineTrim CC</button>
+  <div class="filter-content" style="display:none;">
+    <label><input type="radio" name="engine_trim" value="100" {% if selected_engine_trim == '100' %}checked{% endif %}> Below 100 CC</label><br>
+    <label><input type="radio" name="engine_trim" value="200" {% if selected_engine_trim == '200' %}checked{% endif %}> Below 200 CC</label><br>
+    <label><input type="radio" name="engine_trim" value="300" {% if selected_engine_trim == '300' %}checked{% endif %}> Below 300 CC</label><br>
+    <label><input type="radio" name="engine_trim" value="400" {% if selected_engine_trim == '400' %}checked{% endif %}> Below 400 CC</label><br>
+  </div>
+</div>
+
+      <button type="submit" class="btn-filter-apply">Apply Filters</button>
+    </form>
+  </aside>
+
+  <section class="bike-main">
+    <div class="bike-header">
+      <div><strong>{{ total_bikes }}</strong> Bikes Found</div>
+      <div>
+        <label for="sortSelect">Sort By</label>
+        <select id="sortSelect" name="sort" form="filterForm" onchange="document.getElementById('filterForm').submit()">
+          <option value="newest" {% if sort_option == 'newest' %}selected{% endif %}>Newest First</option>
+          <option value="price_low_high" {% if sort_option == 'price_low_high' %}selected{% endif %}>Price - Low to High</option>
+          <option value="price_high_low" {% if sort_option == 'price_high_low' %}selected{% endif %}>Price - High to Low</option>
+          <option value="km_low_high" {% if sort_option == 'km_low_high' %}selected{% endif %}>KM Driven - Low to High</option>
+          <option value="km_high_low" {% if sort_option == 'km_high_low' %}selected{% endif %}>KM Driven - High to Low</option>
+          <option value="year_old_new" {% if sort_option == 'year_old_new' %}selected{% endif %}>Year - Old to New</option>
+          <option value="year_new_old" {% if sort_option == 'year_new_old' %}selected{% endif %}>Year - New to Old</option>
+        </select>
+      </div>
+    </div>
+<!-- <p>Bikes count: {{ total_bikes }}</p> -->
+
+   <div class="container my-4">
+  <div class="row g-4">
+    {% for bike in page_obj %}
+      <div class="col-12 col-sm-6 col-md-4 d-flex">
+        <a href="{% url 'buy:bike_detail' bike.pk %}" class="bike-card-link w-100">
+          <div class="bike-card card h-100">
+            {% if bike.booked %}
+              <span class="badge bg-danger position-absolute top-0 start-0 m-2">Booked</span>
+            {% endif %}
+            <img src="{{ bike.image.url }}" alt="{{ bike.brand }} {{ bike.model }}" class="card-img-top">
+
+            <div class="card-body">
+              <h4 class="title">
+                {{ bike.year }} | {{ bike.brand }} {{ bike.model }} | {{ bike.engine_cc }}
+              </h4>
+              <p class="details">
+                🕒 {{ bike.kilometers_driven }} Km • {{ bike.fuel_type }} • {{ bike.owner }}
+              </p>
+              <p class="price">₹ {{ bike.price|intcomma }}</p>
+              <p class="location">📍 {{ bike.location }}</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <p>No bikes found matching your criteria.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+    <div class="pagination align-items-center justify-content-center">
+      <nav aria-label="Page navigation">
+        <ul>
+          {% if page_obj.has_previous %}
+          <li><a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a></li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li><strong>{{ num }}</strong></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li><a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <li><a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // JS to toggle filter sections open/close
+  document.querySelectorAll('.filter-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+      const content = button.nextElementSibling;
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    });
+  });
+</script>
+<script>
+  const kmSlider = document.getElementById('km_slider');
+  const kmDisplay = document.getElementById('km_display');
+
+  if (kmSlider && kmDisplay) {
+    kmSlider.addEventListener('input', () => {
+      kmDisplay.value = kmSlider.value;
+    });
+  }
+</script>
+<script>
+  const minYearSlider = document.getElementById('minYearSlider');
+  const maxYearSlider = document.getElementById('maxYearSlider');
+  const minYearInput = document.getElementById('minYearInput');
+  const maxYearInput = document.getElementById('maxYearInput');
+
+  function syncYearInputs() {
+    let minVal = parseInt(minYearSlider.value);
+    let maxVal = parseInt(maxYearSlider.value);
+
+    if (minVal > maxVal) {
+      [minVal, maxVal] = [maxVal, minVal];
+    }
+
+    minYearInput.value = minVal;
+    maxYearInput.value = maxVal;
+  }
+
+  function syncYearSliders() {
+    let minVal = parseInt(minYearInput.value);
+    let maxVal = parseInt(maxYearInput.value);
+
+    if (minVal > maxVal) {
+      [minVal, maxVal] = [maxVal, minVal];
+    }
+
+    minYearSlider.value = minVal;
+    maxYearSlider.value = maxVal;
+  }
+
+  minYearSlider.addEventListener('input', syncYearInputs);
+  maxYearSlider.addEventListener('input', syncYearInputs);
+  minYearInput.addEventListener('change', syncYearSliders);
+  maxYearInput.addEventListener('change', syncYearSliders);
+</script>
+
+
+{% endblock %}
